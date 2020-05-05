@@ -11,10 +11,11 @@ class Node(object):
     penalty = 500
 
     cost_arr = []
+    dir_arr = []
 
-    count = 0
+    num_of_weeks = 8
 
-    def __init__(self, data, store, cost, week):
+    def __init__(self, data, store, cost, week, directory):
 
         self.left = None
         self.right = None
@@ -23,28 +24,33 @@ class Node(object):
         self.cost = cost
         self.week = week
         self.valid = True
+        self.dir = directory
         self.valid_checking()
 
     def insert(self):
         if self.data == 'A' and self.valid:
             if self.left is None:
-                self.left = Node('A', [self.store[0]+Node.prod_A, self.store[1]], self.cost + Node.cost_A, self.week+1)
+                directory = self.dir + ' -> A'
+                self.left = Node('A', [self.store[0]+Node.prod_A, self.store[1]], self.cost + Node.cost_A, self.week+1, directory)
             else:
                 self.left.insert()
 
             if self.right is None:
-                self.right = Node('B', [self.store[0], self.store[1]+Node.prod_B], self.cost + Node.cost_B+Node.penalty, self.week+1)
+                directory = self.dir + ' -> B'
+                self.right = Node('B', [self.store[0], self.store[1]+Node.prod_B], self.cost + Node.cost_B+Node.penalty, self.week+1, directory)
             else:
                 self.right.insert()
 
         if self.data == 'B' and self.valid:
             if self.left is None:
-                self.left = Node('A', [self.store[0]+Node.prod_A, self.store[1]], self.cost + Node.cost_A+Node.penalty, self.week+1)
+                directory = self.dir + ' -> A'
+                self.left = Node('A', [self.store[0]+Node.prod_A, self.store[1]], self.cost + Node.cost_A+Node.penalty, self.week+1, directory)
             else:
                 self.left.insert()
 
             if self.right is None:
-                self.right = Node('B', [self.store[0], self.store[1]+Node.prod_B], self.cost + Node.cost_B, self.week+1)
+                directory = self.dir + ' -> B'
+                self.right = Node('B', [self.store[0], self.store[1]+Node.prod_B], self.cost + Node.cost_B, self.week+1, directory)
             else:
                 self.right.insert()
 
@@ -62,21 +68,26 @@ class Node(object):
 
     def PrintTree(self):
         if self.left:
-            # print("A -> ", end = " ")
             self.left.PrintTree()
 
-        if self.valid and self.week == 7:
-            Node.count = Node.count + 1
-            print(Node.count,". " "-> ", self.data, "\t 1. cost: ", self.cost, "\t 2. store", self.store, "\t 3. valid", self.valid, "\t 3. week", self.week)
+        ''' print only valid node at the end '''
+        if self.valid and self.week == Node.num_of_weeks:
+            print(f"1. cost: {self.cost:7}", f"2. store: {self.store}", f"3. valid: {self.valid}", f"  4. week: {self.week}", f"5. dir: {self.dir}", sep="\t")
             Node.cost_arr.append(self.cost)
+            Node.dir_arr.append(self.dir)
 
-        # if self.right == None :
-        #     print("-> ", self.data, "\t 1. cost: ", self.cost, "\t 2. store", self.store, "\t 3. valid", self.valid, "\t 3. week", self.week)
+        # '''print the week 7 nodes'''
+        # if self.week == 8:
+        #     print(f"1. cost: {self.cost:7}", f"2. store: {self.store}", f"3. valid: {self.valid}", f"  4. week: {self.week}", f"5. dir: {self.dir}", sep="\t")
+        #     Node.cost_arr.append(self.cost)
+        #     Node.dir_arr.append(self.dir)
 
-        # print("-> ", self.data, "\t 1. cost: ", self.cost, "\t 2. store", self.store, "\t 3. valid", self.valid, "\t 3. week", self.week)
+        # '''print all nodes '''
+        # print(f"1. cost: {self.cost:7}", f"2. store: {self.store}", f"3. valid: {self.valid}", f"  4. week: {self.week}", f"5. dir: {self.dir}", sep="\t")
+        # Node.cost_arr.append(self.cost)
+        # Node.dir_arr.append(self.dir)
 
         if self.right:
-            # print("B -> ",  end = " ")
             self.right.PrintTree()
 
 
@@ -84,29 +95,39 @@ data = 'A'
 store = [125, 143]
 cost = 0
 week = 0
+directory = 'A'
 
-root = Node(data, store, cost, week)
 
-root.insert()
-root.insert()
-root.insert()
-root.insert()
-root.insert()
-root.insert()
-root.insert()
+root = Node(data, store, cost, week, directory)
+
+for i in range(Node.num_of_weeks):
+    root.insert()
 
 root.PrintTree()
 
 count=0
+
 minimum = Node.cost_arr[0];
+# Find the minimun
 for i in Node.cost_arr:
     if(minimum > i):
         minimum = i
-    if(i == 165400):
-        count = count + 1
+
+# Find how many times we have the minimum cost
+# And which directories have the minimum cost
+min_dir = []
+for i in range(len(Node.cost_arr)):
+        if(Node.cost_arr[i] == minimum):
+            count = count + 1
+            min_dir.append(Node.dir_arr[i])
+
+
+print("\n\n\n")
+print(len(Node.cost_arr), len(Node.dir_arr))
 
 print(minimum, count)
-
+for i in min_dir:
+    print(i)
 
 
 
