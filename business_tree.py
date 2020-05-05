@@ -81,13 +81,13 @@ class Node(object):
         if self.left:
             self.left.PrintTree()
 
-        ''' print only valid node at the end '''
+        ''' print only valid and <num_of_weeks> nodes  '''
         if self.valid and self.week == Node.num_of_weeks:
             print(f"1. cost: {self.cost:7}", f"2. store: {self.store}", f"3. valid: {self.valid}", f"  4. week: {self.week}", f"5. dir: {self.dir}", sep="\t")
             Node.cost_arr.append(self.cost)
             Node.dir_arr.append(self.dir)
 
-        # '''print the week 7 nodes'''
+        # '''print the week <num_of_weeks> nodes'''
         # if self.week == num_of_weeks:
         #     print(f"1. cost: {self.cost:7}", f"2. store: {self.store}", f"3. valid: {self.valid}", f"  4. week: {self.week}", f"5. dir: {self.dir}", sep="\t")
         #     Node.cost_arr.append(self.cost)
