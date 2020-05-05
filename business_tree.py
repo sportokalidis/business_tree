@@ -2,31 +2,36 @@ import pandas as pd
 
 class Node(object):
 
-    prod_A = 100
-    prod_B = 80
+    prod_A = 100          # Total number of type-A produced per week
+    prod_B = 80           # Total number of type-A produced per week
 
-    cost_A = 225*prod_A
-    cost_B = 310*prod_B
+    cost_A = 225*prod_A   # Total cost of type-A production per week
+    cost_B = 310*prod_B   # Total cost of type-B production per week
 
-    penalty = 500
+    penalty = 500         # Penalty to change product line from type-A to type-B or type-B to type-A
 
-    cost_arr = []
-    dir_arr = []
+    cost_arr = []         # Double Array: Cost of all valid possible directrories
+    dir_arr = []          # All valid possible directories
 
-    num_of_weeks = 8
+    num_of_weeks = 8      # The num of weeks that I want to predict the minimum cost
+
 
     def __init__(self, data, store, cost, week, directory):
 
-        self.left = None
-        self.right = None
-        self.data = data
-        self.store = store
-        self.cost = cost
-        self.week = week
-        self.valid = True
-        self.dir = directory
+        self.left = None          # Node Obj:   The left child of node
+        self.right = None         # Node Obj:   The right child of node
+        self.data = data          # Character:  The type of product 'A' or 'B'
+        self.store = store        # Int Arr[2]: The num of products in storage -> store[0]: type-A and store[1]: type:B
+        self.cost = cost          # Double:     The total cost of production + penalties
+        self.week = week          # Integer:    The week that take place the node,   week = 0(root), 1, 2, ..., num_of_weeks
+        self.valid = True         # Boolean:    Validation of decision, valid == True if company requirements are met,  False if not
+        self.dir = directory      # String:     The path of production line, (A->A->B...)
+
+        # When insert a child, set True or False the valid attribute
         self.valid_checking()
 
+
+    # insert a left and a right child in every node at the end line, only if the decision is valid
     def insert(self):
         if self.data == 'A' and self.valid:
             if self.left is None:
@@ -55,17 +60,23 @@ class Node(object):
                 self.right.insert()
 
 
+    # When insert a child, call 'valid_checking' function to set True or False the valid attribute
     def valid_checking(self):
         if self.week != 0:
+            # Take data from data.csv file
             data = pd.read_csv("data.csv")
+
+            # Update the num of products in storage
             cur_A = self.store[0] - data['A'][self.week-1]
             cur_B = self.store[1] - data['B'][self.week-1]
             self.store = [cur_A, cur_B]
 
+            # check the requirement of company, to have 80% of next week order in storage
             if(cur_A < 0.8*data['A'][self.week] or cur_B <  0.8*data['B'][self.week]):
                 self.valid = False
 
 
+    # print the nodes of tree and main results
     def PrintTree(self):
         if self.left:
             self.left.PrintTree()
@@ -77,7 +88,7 @@ class Node(object):
             Node.dir_arr.append(self.dir)
 
         # '''print the week 7 nodes'''
-        # if self.week == 8:
+        # if self.week == num_of_weeks:
         #     print(f"1. cost: {self.cost:7}", f"2. store: {self.store}", f"3. valid: {self.valid}", f"  4. week: {self.week}", f"5. dir: {self.dir}", sep="\t")
         #     Node.cost_arr.append(self.cost)
         #     Node.dir_arr.append(self.dir)
@@ -91,30 +102,34 @@ class Node(object):
             self.right.PrintTree()
 
 
+# Inint values -> values of root
 data = 'A'
 store = [125, 143]
 cost = 0
 week = 0
 directory = 'A'
 
-
+# Create the root
 root = Node(data, store, cost, week, directory)
 
+# Add nodes
 for i in range(Node.num_of_weeks):
     root.insert()
 
+# print the results
 root.PrintTree()
 
-count=0
 
-minimum = Node.cost_arr[0];
+
 # Find the minimun
+minimum = Node.cost_arr[0];
 for i in Node.cost_arr:
     if(minimum > i):
         minimum = i
 
 # Find how many times we have the minimum cost
 # And which directories have the minimum cost
+count=0
 min_dir = []
 for i in range(len(Node.cost_arr)):
         if(Node.cost_arr[i] == minimum):
@@ -128,12 +143,3 @@ print(len(Node.cost_arr), len(Node.dir_arr))
 print(minimum, count)
 for i in min_dir:
     print(i)
-
-
-
-#
-# data = pd.read_csv("data.csv")
-#
-# cur_A = data['A']
-# print(cur_A[3])
-#
