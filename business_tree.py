@@ -9,6 +9,7 @@ class Node(object):
     cost_B = 310*prod_B   # Total cost of type-B production per week
 
     penalty = 500         # Penalty to change product line from type-A to type-B or type-B to type-A
+    interest_rate = 0.195 # annual interest rate to store products
 
     cost_arr = []         # Double Array: Cost of all valid possible directrories
     dir_arr = []          # All valid possible directories
@@ -71,6 +72,9 @@ class Node(object):
             cur_B = self.store[1] - data['B'][self.week-1]
             self.store = [cur_A, cur_B]
 
+            # Update the cost
+            self.cost = self.cost + cur_A * Node.interest_rate*Node.cost_A/52 + cur_B * Node.interest_rate*Node.cost_B/52
+
             # check the requirement of company, to have 80% of next week order in storage
             if(cur_A < 0.8*data['A'][self.week] or cur_B <  0.8*data['B'][self.week]):
                 self.valid = False
@@ -83,7 +87,8 @@ class Node(object):
 
         ''' print only valid and <num_of_weeks> nodes  '''
         if self.valid and self.week == Node.num_of_weeks:
-            print(f"1. cost: {self.cost:7}", f"2. store: {self.store}", f"3. valid: {self.valid}", f"  4. week: {self.week}", f"5. dir: {self.dir}", sep="\t")
+            # print(f"1. cost: {self.cost:7}", f"2. store: {self.store}", f"3. valid: {self.valid}", f"  4. week: {self.week}", f"5. dir: {self.dir}", sep="\t")
+            print('1. cost: {}    2. store: {}    3. valid: {}    4. week: {}    5. dir: {}'.format(self.cost, self.store, self.valid, self.week, self.dir))
             Node.cost_arr.append(self.cost)
             Node.dir_arr.append(self.dir)
 
